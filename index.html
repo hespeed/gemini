@@ -4,105 +4,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>禾速車隊 HeSpeed Premium</title>
-    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         :root {
             --primary-blue: #1E90FF; --dark-blue: #0a1930; --bg-light: #f4f7f9;
-            --success-green: #28a745; --line-green: #06C755;
+            --white: #ffffff; --success-green: #28a745; --warning-red: #d9534f;
+            --note-bg: #fff4f4; --price-card-bg: #fff;
         }
         body { background-color: var(--bg-light); margin: 0; font-family: "Microsoft JhengHei", sans-serif; }
-        .line-banner { background-color: var(--success-green); text-align: center; padding: 12px 0; }
-        .line-banner a { color: white; text-decoration: none; font-weight: bold; display: block; }
-        header { background-color: var(--primary-blue); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; }
+        header { background-color: var(--primary-blue); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        
+        .banner-container { width: 92%; max-width: 1000px; margin: 15px auto; }
+        .img-grid-2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; }
+        .img-grid-2 img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; }
+
         .nav-menu { display: flex; justify-content: center; gap: 8px; margin: 15px 0; padding: 0 10px; }
         .nav-btn { flex: 1; padding: 12px; border: 2px solid var(--primary-blue); background: white; color: var(--primary-blue); border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
         .nav-btn.active { background: var(--primary-blue); color: white; }
+        
         .section-container { display: none; width: 92%; max-width: 800px; margin: 0 auto 30px; padding: 25px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); box-sizing: border-box; }
         .active { display: block; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .submit-btn { background: var(--primary-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+
+        .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .price-card { background: var(--price-card-bg); border: 1px solid #eef2f6; padding: 12px; border-radius: 10px; font-size: 0.85rem; }
+        .service-note-box { margin-top: 15px; padding: 12px; background-color: var(--note-bg); border-left: 4px solid var(--warning-red); color: #b94a48; font-size: 0.85rem; border-radius: 4px; }
+
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        .submit-btn { background: var(--primary-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .logged-in-only { display: none; }
     </style>
 </head>
 <body>
 
-<div class="line-banner">
-    <a href="https://line.me/R/ti/p/@372fxlit" target="_blank">官方 LINE 帳號：@372fxlit (點擊自動登入)</a>
-</div>
+<div style="background-color: var(--success-green); color: white; text-align: center; padding: 10px 0; font-weight: bold;">官方 LINE 帳號：@hespeed</div>
 
 <header>
-    <h1 style="margin:0; font-size: 1.2rem;">禾速車隊 HeSpeed</h1>
+    <h1>禾速車隊 HeSpeed</h1>
     <div id="user-display">訪客您好</div>
 </header>
+
+<div class="banner-container">
+    <div class="img-grid-2">
+        <img src="https://www.mercedes-benz.com.tw/content/dam/taiwan/passengercars/models/saloon/c-class/11053396_BiMB_1_0_Refresh_C-Class_KV_real_car_3-4_front_fullbleed_RGB-original.jpg">
+        <img src="https://www.mercedes-benz.com.tw/content/dam/taiwan/passengercars/index/campaign-component/2025-SClass-V223.png/1775130049424.jpg">
+    </div>
+</div>
 
 <div class="nav-menu">
     <button class="nav-btn active" onclick="switchTab('home', this)">首頁</button>
     <button class="nav-btn guest-only" onclick="switchTab('login', this)">登入</button>
-    <button class="nav-btn logged-in-only" onclick="switchTab('booking', this)">預約派車</button>
+    <button class="nav-btn guest-only" onclick="switchTab('register', this)">註冊</button>
+    <button class="nav-btn logged-in-only" onclick="switchTab('member-area', this)">會員管理</button>
 </div>
 
 <div id="home" class="section-container active">
-    <h3>專業接送服務</h3>
-    <button class="submit-btn" onclick="openBooking('機場接機')">立即預約接機</button>
-    <button class="submit-btn" style="background:#666; margin-top:10px;" onclick="openBooking('機場送機')">立即預約送機</button>
-</div>
-
-<div id="login" class="section-container">
-    <h3>會員登入</h3>
-    <button class="submit-btn" style="background:var(--line-green);" onclick="liffLogin()">🟢 LINE 一鍵登入</button>
-    <div style="text-align:center; margin:15px 0; color:#888;">或使用手機登入</div>
-    <input type="tel" id="login-phone" placeholder="手機號碼">
-    <input type="password" id="login-pwd" placeholder="密碼">
-    <button class="submit-btn" onclick="handleManualLogin()">登入</button>
+    <h2 style="text-align: center; color: var(--primary-blue);">尊榮接送服務</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+        <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer;" onclick="openBooking('機場接機')">✈️<br>接機</div>
+        <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer;" onclick="openBooking('機場送機')">🛫<br>送機</div>
+        <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer;" onclick="openBooking('定點接送')">📍<br>定點</div>
+    </div>
+    <div class="price-grid">
+        <div class="price-card"><b>桃園機場 (TPE)</b>台北 $1600起<br>新北 $1500起</div>
+        <div class="price-card"><b>松山機場 (TSA)</b>台北 $1200起<br>新北 $1300起</div>
+    </div>
 </div>
 
 <div id="booking" class="section-container">
-    <h3 id="booking-title">預約表單</h3>
-    <input type="hidden" id="order-type">
-    <input type="date" id="order-date">
-    <input type="time" id="order-time">
-    <input type="text" id="pickup" placeholder="起點">
-    <input type="text" id="dropoff" placeholder="終點">
-    <select id="car-type">
-        <option>豪華轎車 (4人座)</option>
-        <option>豪華商務車 (7-9人座)</option>
+    <h2 style="text-align:center; color:var(--primary-blue)">服務預訂</h2>
+    <label>服務類型</label>
+    <select id="order-type" onchange="adjustFieldsByService()">
+        <option value="機場接機">機場接機</option>
+        <option value="機場送機">機場送機</option>
+        <option value="定點接送">定點接送</option>
     </select>
-    <button class="submit-btn" onclick="processOrder()">確認提交</button>
+    <div style="display: flex; gap: 10px;">
+        <div style="flex:1"><label>日期</label><input type="date" id="order-date"></div>
+        <div style="flex:1"><label>時間</label><input type="time" id="order-time"></div>
+    </div>
+    <div id="dynamic-service-note" class="service-note-box"></div>
+    <div id="pickup-container"></div>
+    <div id="dropoff-container"></div>
+    <label>航班編號</label><input type="text" id="order-flight" placeholder="例：BR198">
+    <div style="display: flex; gap: 10px;">
+        <div style="flex:1"><label>人數</label><select id="order-pax"></select></div>
+        <div style="flex:1"><label>行李</label><select id="order-luggage"></select></div>
+    </div>
+    <label>車型需求</label>
+    <select id="order-car">
+        <option value="四人座轎車">四人座轎車</option>
+        <option value="四人座休旅車">四人座休旅車</option>
+        <option value="豪華7~9人座車">豪華7~9人座車</option>
+    </select>
+    <label>備註需求</label><input type="text" id="order-note" placeholder="例如：需安全座椅">
+    <button class="submit-btn" id="order-btn" onclick="handleOrder()">確認預約並送出</button>
+</div>
+
+<div id="member-area" class="section-container">
+    <h2 style="text-align: center; color: var(--primary-blue);">會員管理</h2>
+    <label>真實姓名</label><input type="text" id="mem-name">
+    <label>常用地址</label><input type="text" id="mem-address">
+    <hr style="margin:25px 0; border:0.5px solid #eee;">
+    <label>修改新密碼</label><input type="password" id="mem-new-pwd">
+    <label>確認新密碼</label><input type="password" id="mem-new-pwd-confirm">
+    <button class="submit-btn" id="save-mem-btn" onclick="updateMemberInfo()">更新會員資料</button>
+    <button class="submit-btn" style="background:#666; margin-top: 10px;" onclick="location.reload()">登出</button>
+</div>
+
+<div id="login" class="section-container">
+    <h2 style="text-align:center;">登入</h2>
+    <input type="text" id="login-phone" placeholder="手機號碼"><input type="password" id="login-pwd" placeholder="密碼">
+    <button class="submit-btn" onclick="handleLogin()">登入</button>
+</div>
+
+<div id="register" class="section-container">
+    <h2 style="text-align:center;">註冊</h2>
+    <input type="text" id="reg-phone" placeholder="手機號碼"><input type="password" id="reg-pwd" placeholder="密碼">
+    <button class="submit-btn" onclick="handleRegister()">註冊</button>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwlgcngo9zq4TNcJDxag8y3DPSz2SudurEuEwj3joVTnxs1iw-hTiUQKEUtvYk5mw/exec"; 
-    const LIFF_ID = "2009890777-cM1Qxrxz"; 
-    let currentAccount = "";
+    // 🔴 這裡請填入您最新的 GAS 網址
+    const API_URL = "https://script.google.com/macros/s/AKfycbxT_V7w1Cxr8ENW3rTl0uQ0XcBkLK4RaerOitp3B9jNMdmnnSz0h6KexWxd2pbrcKRX/exec"; 
+    let currentLoggedUser = "";
 
-    async function initLiff() {
-        try {
-            await liff.init({ liffId: LIFF_ID });
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                loginSuccess(profile.displayName, "LINE_USER");
-            }
-        } catch (e) { console.error("LIFF 載入失敗"); }
-    }
-
-    function liffLogin() { if (!liff.isLoggedIn()) liff.login(); }
-
-    function loginSuccess(name, acc) {
-        currentAccount = acc;
-        document.getElementById('user-display').innerText = "會員：" + name;
-        document.querySelectorAll('.guest-only').forEach(e => e.style.display = 'none');
-        document.querySelectorAll('.logged-in-only').forEach(e => e.style.display = 'block');
-        switchTab('home', document.querySelector('.nav-btn'));
-    }
-
-    function openBooking(type) {
-        if(!currentAccount) {
-            alert("請先登入會員");
-            return switchTab('login', document.querySelectorAll('.nav-btn')[1]);
-        }
-        document.getElementById('order-type').value = type;
-        document.getElementById('booking-title').innerText = "預約 - " + type;
-        switchTab('booking', null);
-    }
+    window.onload = function() {
+        const p = document.getElementById('order-pax');
+        for (let i = 1; i <= 8; i++) p.options.add(new Option(i + " 位", i));
+        const l = document.getElementById('order-luggage');
+        for (let i = 1; i <= 10; i++) l.options.add(new Option(i + " 件", i));
+        adjustFieldsByService();
+    };
 
     function switchTab(id, btn) {
         document.querySelectorAll('.section-container').forEach(s => s.classList.remove('active'));
@@ -113,12 +145,139 @@
         }
     }
 
-    async function processOrder() {
-        alert("訂單已發送！");
+    function adjustFieldsByService() {
+        const type = document.getElementById('order-type').value;
+        const note = document.getElementById('dynamic-service-note');
+        const pCont = document.getElementById('pickup-container');
+        const dCont = document.getElementById('dropoff-container');
+        
+        const airportSel = `<select id="order-airport-list"><option>桃園國際機場</option><option>台北松山機場</option><option>台中清泉崗機場</option><option>高雄小港機場</option></select>`;
+        const addrInp = `<input type="text" id="order-address-input" placeholder="請輸入地址">`;
+
+        if (type === "機場接機") {
+            note.innerHTML = "<b>接機提醒：</b>落地過90分鐘未上車，將產生逾時費。";
+            pCont.innerHTML = `<label>起點 (機場)</label>` + airportSel;
+            dCont.innerHTML = `<label>終點 (送達地址)</label>` + addrInp;
+        } else if (type === "機場送機") {
+            note.innerHTML = "<b>送機提醒：</b>請提早於起飛前3小時出發。";
+            pCont.innerHTML = `<label>起點 (接人地址)</label>` + addrInp;
+            dCont.innerHTML = `<label>終點 (機場)</label>` + airportSel;
+        } else {
+            note.innerHTML = "<b>定點提醒：</b>市區預約接送。";
+            pCont.innerHTML = `<label>起點地址</label><input type="text" id="order-p-addr">`;
+            dCont.innerHTML = `<label>終點地址</label><input type="text" id="order-d-addr">`;
+        }
+    }
+
+    async function handleOrder() {
+        if(!currentLoggedUser) return alert("請先登入");
+        
+        // 加入防呆：確認車型是否受人數影響
+        const paxCount = parseInt(document.getElementById('order-pax').value);
+        if(paxCount > 4) {
+            document.getElementById('order-car').value = "豪華7~9人座車";
+        }
+
+        const type = document.getElementById('order-type').value;
+        let pV, dV;
+        if(type === "機場接機") { pV = document.getElementById('order-airport-list').value; dV = document.getElementById('order-address-input').value; }
+        else if(type === "機場送機") { pV = document.getElementById('order-address-input').value; dV = document.getElementById('order-airport-list').value; }
+        else { pV = document.getElementById('order-p-addr').value; dV = document.getElementById('order-d-addr').value; }
+
+        const btn = document.getElementById('order-btn');
+        btn.disabled = true; btn.innerText = "資料傳送中...";
+
+        try {
+            await fetch(API_URL + "?t=" + Date.now(), {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({
+                    action: "submitOrder",
+                    data: {
+                        type: type, 
+                        account: currentLoggedUser,
+                        date: document.getElementById('order-date').value,
+                        time: document.getElementById('order-time').value,
+                        pickup: pV, dropoff: dV,
+                        flightNum: document.getElementById('order-flight').value || "-",
+                        pax: document.getElementById('order-pax').value,
+                        luggage: document.getElementById('order-luggage').value,
+                        carType: document.getElementById('order-car').value,
+                        note: document.getElementById('order-note').value
+                    }
+                })
+            });
+            alert("訂單送出成功！已通知客服團隊。");
+            switchTab('home', document.querySelector('.nav-btn'));
+        } catch (e) {
+            alert("傳送失敗，請檢查網路連線。");
+        } finally {
+            btn.disabled = false; btn.innerText = "確認預約並送出";
+        }
+    }
+
+    async function updateMemberInfo() {
+        const pwd = document.getElementById('mem-new-pwd').value;
+        const pwdC = document.getElementById('mem-new-pwd-confirm').value;
+        if(pwd !== pwdC) return alert("新密碼與確認密碼不一致！");
+        
+        const btn = document.getElementById('save-mem-btn');
+        btn.disabled = true; btn.innerText = "更新中...";
+
+        try {
+            await fetch(API_URL + "?t=" + Date.now(), {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({
+                    action: "updateMember",
+                    data: { account: currentLoggedUser, name: document.getElementById('mem-name').value, address: document.getElementById('mem-address').value, password: pwd }
+                })
+            });
+            alert("會員資料已成功更新。");
+            document.getElementById('mem-new-pwd').value = "";
+            document.getElementById('mem-new-pwd-confirm').value = "";
+        } catch (e) {
+            alert("更新失敗。");
+        } finally {
+            btn.disabled = false; btn.innerText = "更新會員資料";
+        }
+    }
+
+    function handleLogin() {
+        const ph = document.getElementById('login-phone').value.trim();
+        if(ph.length < 10) return alert("請輸入完整手機號碼");
+        currentLoggedUser = ph;
+        document.getElementById('user-display').innerText = "會員：" + ph;
+        document.querySelectorAll('.guest-only').forEach(e => e.style.display = 'none');
+        document.querySelectorAll('.logged-in-only').forEach(e => e.style.display = 'block');
         switchTab('home', document.querySelector('.nav-btn'));
     }
 
-    window.onload = initLiff;
+    function openBooking(type) {
+        if(!currentLoggedUser) return switchTab('login', document.querySelectorAll('.nav-btn')[1]);
+        document.getElementById('order-type').value = type;
+        adjustFieldsByService();
+        switchTab('booking', null);
+    }
+
+    async function handleRegister() {
+        const ph = document.getElementById('reg-phone').value.trim();
+        if(ph.length < 10) return alert("請輸入完整手機號碼");
+        
+        const btn = document.querySelector('#register .submit-btn');
+        btn.disabled = true; btn.innerText = "註冊中...";
+        
+        try {
+            await fetch(API_URL + "?t=" + Date.now(), {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ action: "register", data: { account: ph, password: document.getElementById('reg-pwd').value } })
+            });
+            alert("註冊成功！");
+            handleLogin();
+        } catch (e) {
+            alert("註冊失敗");
+        } finally {
+            btn.disabled = false; btn.innerText = "註冊";
+        }
+    }
 </script>
 </body>
 </html>

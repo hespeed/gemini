@@ -88,7 +88,11 @@
 
 <div id="login" class="section-container">
     <h2 style="text-align:center; margin-top:0;">會員登入 / 註冊</h2>
+    
     <button class="submit-btn" style="background:var(--line-green); margin-top:0;" onclick="liffLogin()">🟢 LINE 一鍵登入</button>
+    <p style="font-size: 0.85rem; color: #555; text-align: center; margin-top: 10px; margin-bottom: 25px; font-weight: bold;">
+        *首次使用請填寫手機與密碼，後續即可享有 LINE 自動登入。
+    </p>
     
     <div style="text-align:center; margin:20px 0; color:#888; font-size:0.9rem;">─ 或使用手機號碼 ─</div>
     <label>手機號碼</label><input type="tel" id="login-phone" placeholder="請輸入手機號碼 (必填)">
@@ -97,7 +101,6 @@
     <input type="text" id="login-name" placeholder="例如：王先生 / 李小姐 (選填)">
     
     <button class="submit-btn" id="manual-login-btn" onclick="handleManualLogin()">確認 登入 / 註冊</button>
-    <p style="font-size: 0.8rem; color: #666; text-align: center; margin-top: 15px;">*首次使用請填寫手機與密碼，後續即可享有 LINE 自動登入。</p>
 </div>
 
 <div id="booking" class="section-container">
@@ -157,12 +160,12 @@
 
 <script>
     // 🔴 這裡請填入您最新的 GAS 發佈網址 與 LIFF ID
-    const API_URL = "https://script.google.com/macros/s/AKfycbyyJlyShri58UTnBmzhN5qqLVjb8EnT60KCPUYRhBHoCgSYGIAuzUw9_Szbq3UoFgb2/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbwTRRbNxK9bUq-LuQAEmFEifquLO24GvX1NyVbiTRObuu-NvzyE_wlAW3bC1KJ1aTP2/exec"; 
     const LIFF_ID = "2009890777-cM1Qxrxz"; 
     
     let currentLoggedUser = "";
     let currentUserName = "";
-    let currentLineUserId = ""; // 🟢 儲存當前 LINE ID
+    let currentLineUserId = ""; 
 
     window.onload = function() {
         const p = document.getElementById('order-pax');
@@ -173,19 +176,17 @@
         initLiff();
     };
 
-    // 🟢 完整的 LIFF 初始化與自動登入驗證
     async function initLiff() {
         try {
             await liff.init({ liffId: LIFF_ID });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
-                currentLineUserId = profile.userId; // 儲存起來供綁定用
+                currentLineUserId = profile.userId; 
                 verifyLineAutoLogin(currentLineUserId);
             }
         } catch (e) { console.error("LIFF 初始化失敗"); }
     }
 
-    // 🟢 向後端確認該 LINE ID 是否已存在
     async function verifyLineAutoLogin(lineId) {
         try {
             const res = await fetch(API_URL, {
@@ -247,7 +248,6 @@
         }
     }
 
-    // 🟢 登入/註冊：此處會一併將 currentLineUserId 送出給後端綁定
     async function handleManualLogin() {
         const ph = document.getElementById('login-phone').value.trim();
         const pwd = document.getElementById('login-pwd').value.trim();
@@ -263,7 +263,6 @@
                 method: 'POST',
                 body: JSON.stringify({ 
                     action: "loginOrRegister", 
-                    // 送出包含 lineUserId 的資料
                     data: { account: ph, password: pwd, name: name, lineUserId: currentLineUserId } 
                 })
             });

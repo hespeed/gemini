@@ -13,27 +13,18 @@
         }
         body { background-color: var(--bg-light); margin: 0; font-family: "Microsoft JhengHei", sans-serif; }
         
-        /* 🔵 修改後的頂部橫幅 */
+        /* 修改功能：上方官方 LINE 連結 */
         .line-banner { 
             background-color: var(--success-green); 
-            text-align: center; 
-            padding: 12px 0; 
+            text-align: center; padding: 12px 0; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .line-banner a { 
-            color: white; 
-            text-decoration: none; 
-            font-weight: bold; 
-            font-size: 1rem;
-            display: block; 
-            width: 100%; 
+            color: white; text-decoration: none; font-weight: bold; font-size: 1rem;
+            display: block; width: 100%; 
         }
 
         header { background-color: var(--primary-blue); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .banner-container { width: 92%; max-width: 1000px; margin: 15px auto; }
-        .img-grid-2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; }
-        .img-grid-2 img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; }
-
         .nav-menu { display: flex; justify-content: center; gap: 8px; margin: 15px 0; padding: 0 10px; }
         .nav-btn { flex: 1; padding: 12px; border: 2px solid var(--primary-blue); background: white; color: var(--primary-blue); border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
         .nav-btn.active { background: var(--primary-blue); color: white; }
@@ -50,20 +41,13 @@
 <body>
 
 <div class="line-banner">
-    <a href="https://line.me/R/ti/p/@372fxlit" target="_blank">官方 LINE 帳號：@372fxlit (點擊加入好友/自動登入)</a>
+    <a href="https://line.me/R/ti/p/@372fxlit" target="_blank">官方 LINE 帳號：@372fxlit (點擊加入並快速登入)</a>
 </div>
 
 <header>
     <h1 style="margin:0; font-size: 1.2rem;">禾速車隊 HeSpeed</h1>
     <div id="user-display">訪客您好</div>
 </header>
-
-<div class="banner-container">
-    <div class="img-grid-2">
-        <img src="https://www.mercedes-benz.com.tw/content/dam/taiwan/passengercars/models/saloon/c-class/11053396_BiMB_1_0_Refresh_C-Class_KV_real_car_3-4_front_fullbleed_RGB-original.jpg">
-        <img src="https://www.mercedes-benz.com.tw/content/dam/taiwan/passengercars/index/campaign-component/2025-SClass-V223.png/1775130049424.jpg">
-    </div>
-</div>
 
 <div class="nav-menu">
     <button class="nav-btn active" onclick="switchTab('home', this)">首頁</button>
@@ -73,52 +57,50 @@
 
 <div id="home" class="section-container active">
     <h3>優質接送服務</h3>
-    <p>專業機場接送、商務包車，一鍵預約您的專屬行程。</p>
     <button class="submit-btn" onclick="openBooking('機場接機')">立即預約接機</button>
 </div>
 
 <div id="login" class="section-container">
     <h3>會員登入</h3>
-    <button class="submit-btn line-login-btn" onclick="triggerLineLogin()">🟢 使用 LINE 一鍵自動登入</button>
+    <button class="submit-btn line-login-btn" onclick="liffAutoLogin()">🟢 LINE 帳號一鍵登入</button>
     
     <div style="text-align:center; margin-bottom:15px; color:#888;">─ 或使用手機號碼 ─</div>
     <input type="tel" id="login-phone" placeholder="手機號碼">
     <input type="password" id="login-pwd" placeholder="密碼">
-    <button class="submit-btn" onclick="handleStandardLogin()">登入</button>
+    <button class="submit-btn" onclick="handleManualLogin()">登入</button>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwsSpbj-0z9u8NRMQD0I7BpwGwSF8Bv3H1gp3qBem8hmMtuf8m5aXYlZaSDKuIChWUz/exec"; 
-    const LIFF_ID = "2009890777"; // 請填入 LINE Developers 申請的 ID
+    const API_URL = "https://script.google.com/macros/s/AKfycbzqoJPh19VZ8kxPvh33tq5JBKdj_TdTS-d2HL9ah6vYBy-NgthyMp339F7oHjHI7w08/exec"; 
+    const LIFF_ID = "2009890777-cM1Qxrxz"; // 需從 LINE Developers 取得
 
-    let currentLoggedUser = "";
+    let currentUser = null;
 
-    // 🟢 初始化 LIFF 自動登入
+    // 🟢 初始化 LIFF
     async function initLiff() {
         try {
             await liff.init({ liffId: LIFF_ID });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
-                verifyWithBackend(profile.userId, profile.displayName);
+                verifyLineUser(profile.userId, profile.displayName);
             }
-        } catch (e) { console.log("LIFF Init Failed", e); }
+        } catch (e) { console.error("LIFF 初始化失敗", e); }
     }
 
-    function triggerLineLogin() {
-        if (!liff.isLoggedIn()) { liff.login(); }
+    function liffAutoLogin() {
+        if (!liff.isLoggedIn()) {
+            liff.login();
+        }
     }
 
-    async function verifyWithBackend(lineId, name) {
-        // 向 GAS 發送自動登入請求
-        // 若資料庫有匹配，直接進入會員狀態
+    async function verifyLineUser(lineId, name) {
+        // 向後端請求比對 LINE ID
+        // 若比對成功則更新 UI，略過輸入密碼
         document.getElementById('user-display').innerText = "會員：" + name;
-        currentLoggedUser = "LINE_AUTO"; 
-        updateUI(true);
-    }
-
-    function updateUI(isLoggedIn) {
-        document.querySelectorAll('.guest-only').forEach(e => e.style.display = isLoggedIn ? 'none' : 'block');
-        document.querySelectorAll('.logged-in-only').forEach(e => e.style.display = isLoggedIn ? 'block' : 'none');
+        currentUser = { name: name }; 
+        document.querySelectorAll('.guest-only').forEach(e => e.style.display = 'none');
+        document.querySelectorAll('.logged-in-only').forEach(e => e.style.display = 'block');
+        switchTab('home', document.querySelector('.nav-btn'));
     }
 
     function switchTab(id, btn) {

@@ -13,7 +13,8 @@
         }
         body { background-color: var(--bg-light); margin: 0; font-family: "Microsoft JhengHei", sans-serif; }
         
-        .line-banner { background-color: var(--success-green); color: white; text-align: center; padding: 10px 0; font-weight: bold; }
+        /* 舊版橫幅先隱藏 (display:none)，若未來需要可隨時改回 display:block */
+        .line-banner { display: none; background-color: var(--success-green); color: white; text-align: center; padding: 10px 0; font-weight: bold; }
         .line-banner a { color: white; text-decoration: none; display: block; }
         
         header { background-color: var(--primary-blue); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
@@ -44,6 +45,52 @@
         input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         .submit-btn { background: var(--primary-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
         .logged-in-only { display: none; }
+
+        /* 🟢 右下角浮動 LINE 按鈕與動畫 */
+        .floating-line-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--line-green);
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(6, 199, 85, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            text-decoration: none;
+            animation: pulse 2s infinite;
+        }
+        .floating-line-tooltip {
+            position: absolute;
+            right: 75px;
+            background: white;
+            color: var(--dark-blue);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .floating-line-tooltip::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px 0 6px 6px;
+            border-style: solid;
+            border-color: transparent transparent transparent white;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(6, 199, 85, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(6, 199, 85, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(6, 199, 85, 0); }
+        }
     </style>
 </head>
 <body>
@@ -158,9 +205,16 @@
     <button class="submit-btn" style="background:#666; margin-top: 10px;" onclick="location.reload()">登出系統</button>
 </div>
 
+<a href="https://line.me/R/ti/p/@372fxlit" target="_blank" class="floating-line-btn">
+    <div class="floating-line-tooltip">專屬客服預約</div>
+    <svg viewBox="0 0 24 24" width="35" height="35" fill="white">
+        <path d="M21.543 10.498c0-4.321-4.22-7.85-9.42-7.85-5.197 0-9.418 3.529-9.418 7.85 0 3.86 3.376 7.153 8.016 7.766 1.05.158 1.463.766 1.258 1.503-.134.484-.424 1.543-.497 1.848-.112.464-.325 1.156 1.052.576 1.378-.58 7.42-4.373 8.57-6.284.288-.477.439-.967.439-1.409zm-13.82 1.488H6.182c-.347 0-.629-.282-.629-.629V8.673c0-.347.282-.629.629-.629.347 0 .629.282.629.629v2.054h1.541c.347 0 .629.282.629.629 0 .347-.282.629-.629.629zm2.748 0H9.191c-.347 0-.629-.282-.629-.629V8.673c0-.347.282-.629.629-.629.347 0 .629.282.629.629v2.684c0 .347-.282.629-.629.629zm3.504-1.921l-1.614-1.896c-.156-.184-.338-.282-.53-.282-.347 0-.629.282-.629.629v2.684c0 .347.282.629.629.629.277 0 .524-.183.606-.445l1.583-1.859v1.675c0 .347.282.629.629.629.347 0 .629-.282.629-.629V8.673c0-.347-.282-.629-.629-.629-.272 0-.518.176-.603.433l-.071.29zm3.768-.133h-1.54v-.695h1.54c.347 0 .629-.282.629-.629 0-.347-.282-.629-.629-.629h-2.17c-.347 0-.629.282-.629.629v2.684c0 .347.282.629.629.629h2.17c.347 0 .629-.282.629-.629 0-.347-.282-.629-.629-.629z"/>
+    </svg>
+</a>
+
 <script>
     // 🔴 這裡請填入您最新的 GAS 發佈網址 與 LIFF ID
-    const API_URL = "https://script.google.com/macros/s/AKfycbyfLOJmPs2JDnaZWlSIjFCeLSe_dIvMTLH2kNM8sWbdLV5P0HC7WENxBPPoPahJ5c51/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbxlCWpdHlOrjmugJ1iW3zta-AXe2ae3pVNuh_CK5Bex4jIXX_hGhCYFmvEcqqjTnmhN/exec"; 
     const LIFF_ID = "2009890777-cM1Qxrxz"; 
     
     let currentLoggedUser = "";
@@ -224,17 +278,17 @@
         const flightStar = document.getElementById('flight-req-star');
 
         if (type === "機場接機") {
-            note.innerHTML = "<b>接機提醒：</b>若超過落地時間90分鐘、，仍未上車，每15分鐘加收NT$100逾時費，不足15分鐘以15分鐘計。";
+            note.innerHTML = "<b>接機提醒：</b>落地過90分鐘未上車，將產生逾時費。";
             pCont.innerHTML = `<label>起點 (機場)</label>` + airportSel;
             dCont.innerHTML = `<label>終點 (送達地址)</label>` + addrInp;
             flightStar.style.display = 'inline';
         } else if (type === "機場送機") {
-            note.innerHTML = "<b>送機提醒：</b>接單後服務人員將視狀況聯絡貴賓告知正確的接車時間。";
+            note.innerHTML = "<b>送機提醒：</b>請提早於起飛前3小時出發。";
             pCont.innerHTML = `<label>起點 (接人地址)</label>` + addrInp;
             dCont.innerHTML = `<label>終點 (機場)</label>` + airportSel;
             flightStar.style.display = 'inline';
         } else {
-            note.innerHTML = "<b>定點提醒：</b>若超過預定時間，每15分鐘加收NT$100逾時費，不足15分鐘以15分鐘計。";
+            note.innerHTML = "<b>定點提醒：</b>市區預約接送。";
             pCont.innerHTML = `<label>起點地址</label><input type="text" id="order-p-addr" placeholder="請輸入起點">`;
             dCont.innerHTML = `<label>終點地址</label><input type="text" id="order-d-addr" placeholder="請輸入終點">`;
             flightStar.style.display = 'none';

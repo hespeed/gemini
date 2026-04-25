@@ -224,17 +224,17 @@
         const flightStar = document.getElementById('flight-req-star');
 
         if (type === "機場接機") {
-            note.innerHTML = "<b>接機提醒：</b>落地過90分鐘未上車，將產生逾時費。";
+            note.innerHTML = "<b>接機提醒：</b>若超過落地時間90分鐘、，仍未上車，每15分鐘加收NT$100逾時費，不足15分鐘以15分鐘計。";
             pCont.innerHTML = `<label>起點 (機場)</label>` + airportSel;
             dCont.innerHTML = `<label>終點 (送達地址)</label>` + addrInp;
             flightStar.style.display = 'inline';
         } else if (type === "機場送機") {
-            note.innerHTML = "<b>送機提醒：</b>請提早於起飛前3小時出發。";
+            note.innerHTML = "<b>送機提醒：</b>接單後服務人員將視狀況聯絡貴賓告知正確的接車時間。";
             pCont.innerHTML = `<label>起點 (接人地址)</label>` + addrInp;
             dCont.innerHTML = `<label>終點 (機場)</label>` + airportSel;
             flightStar.style.display = 'inline';
         } else {
-            note.innerHTML = "<b>定點提醒：</b>市區預約接送。";
+            note.innerHTML = "<b>定點提醒：</b>若超過預定時間，每15分鐘加收NT$100逾時費，不足15分鐘以15分鐘計。";
             pCont.innerHTML = `<label>起點地址</label><input type="text" id="order-p-addr" placeholder="請輸入起點">`;
             dCont.innerHTML = `<label>終點地址</label><input type="text" id="order-d-addr" placeholder="請輸入終點">`;
             flightStar.style.display = 'none';

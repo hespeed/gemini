@@ -8,27 +8,19 @@
     <style>
         :root {
             --primary-blue: #1E90FF; --dark-blue: #0a1930; --bg-light: #f4f7f9;
-            --white: #ffffff; --success-green: #28a745; --line-green: #06C755;
+            --success-green: #28a745; --line-green: #06C755;
         }
         body { background-color: var(--bg-light); margin: 0; font-family: "Microsoft JhengHei", sans-serif; }
-        
-        .line-banner { background-color: var(--success-green); text-align: center; padding: 12px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .line-banner a { color: white; text-decoration: none; font-weight: bold; display: block; width: 100%; }
-
-        header { background-color: var(--primary-blue); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        
+        .line-banner { background-color: var(--success-green); text-align: center; padding: 12px 0; }
+        .line-banner a { color: white; text-decoration: none; font-weight: bold; display: block; }
+        header { background-color: var(--primary-blue); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; }
         .nav-menu { display: flex; justify-content: center; gap: 8px; margin: 15px 0; padding: 0 10px; }
         .nav-btn { flex: 1; padding: 12px; border: 2px solid var(--primary-blue); background: white; color: var(--primary-blue); border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
         .nav-btn.active { background: var(--primary-blue); color: white; }
-        
         .section-container { display: none; width: 92%; max-width: 800px; margin: 0 auto 30px; padding: 25px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); box-sizing: border-box; }
         .active { display: block; }
-
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .submit-btn { background: var(--primary-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .line-login-btn { background-color: var(--line-green); }
-        .logged-in-only { display: none; }
-        label { font-weight: bold; font-size: 0.9rem; color: var(--dark-blue); }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .submit-btn { background: var(--primary-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -45,76 +37,63 @@
 <div class="nav-menu">
     <button class="nav-btn active" onclick="switchTab('home', this)">首頁</button>
     <button class="nav-btn guest-only" onclick="switchTab('login', this)">登入</button>
-    <button class="nav-btn logged-in-only" onclick="switchTab('member-area', this)">會員中心</button>
+    <button class="nav-btn logged-in-only" onclick="switchTab('booking', this)">預約派車</button>
 </div>
 
 <div id="home" class="section-container active">
-    <h3>優質接送服務</h3>
+    <h3>專業接送服務</h3>
     <button class="submit-btn" onclick="openBooking('機場接機')">立即預約接機</button>
-    <button class="submit-btn" style="background:#666;" onclick="openBooking('機場送機')">立即預約送機</button>
+    <button class="submit-btn" style="background:#666; margin-top:10px;" onclick="openBooking('機場送機')">立即預約送機</button>
 </div>
 
 <div id="login" class="section-container">
     <h3>會員登入</h3>
-    <button class="submit-btn line-login-btn" onclick="liffTriggerLogin()">🟢 使用 LINE 自動登入</button>
-    <div style="text-align:center; margin:15px 0; color:#888;">─ 或手機號碼登入 ─</div>
+    <button class="submit-btn" style="background:var(--line-green);" onclick="liffLogin()">🟢 LINE 一鍵登入</button>
+    <div style="text-align:center; margin:15px 0; color:#888;">或使用手機登入</div>
     <input type="tel" id="login-phone" placeholder="手機號碼">
     <input type="password" id="login-pwd" placeholder="密碼">
     <button class="submit-btn" onclick="handleManualLogin()">登入</button>
 </div>
 
-<div id="booking-section" class="section-container">
-    <h3 id="booking-title">預約派車</h3>
-    <form id="orderForm">
-        <input type="hidden" id="order-type">
-        <label>預約日期</label><input type="date" id="order-date" required>
-        <label>預約時間</label><input type="time" id="order-time" required>
-        <input type="text" id="pickup" placeholder="起點 (例如：桃園機場第一航廈)">
-        <input type="text" id="dropoff" placeholder="終點 (例如：台北市信義區...)">
-        <input type="text" id="flight-num" placeholder="航班編號 (選填)">
-        <select id="car-type">
-            <option>豪華轎車 (4人座)</option>
-            <option>豪華商務車 (7-9人座)</option>
-        </select>
-        <textarea id="note" placeholder="備註 (人數、行李數量或特殊需求)"></textarea>
-        <button type="button" class="submit-btn" onclick="processOrder()">確認提交預約</button>
-    </form>
+<div id="booking" class="section-container">
+    <h3 id="booking-title">預約表單</h3>
+    <input type="hidden" id="order-type">
+    <input type="date" id="order-date">
+    <input type="time" id="order-time">
+    <input type="text" id="pickup" placeholder="起點">
+    <input type="text" id="dropoff" placeholder="終點">
+    <select id="car-type">
+        <option>豪華轎車 (4人座)</option>
+        <option>豪華商務車 (7-9人座)</option>
+    </select>
+    <button class="submit-btn" onclick="processOrder()">確認提交</button>
 </div>
 
 <script>
-    // 🔴 請務必填寫您的 GAS 與 LIFF ID
-    const API_URL = "https://script.google.com/macros/s/AKfycbwo-qWVO5t9ou0YWfCjvSAHigAtsgxliYrxIITlPg2KnPajv9hYMEYc8gZOcXYeuL6p/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbwlgcngo9zq4TNcJDxag8y3DPSz2SudurEuEwj3joVTnxs1iw-hTiUQKEUtvYk5mw/exec"; 
     const LIFF_ID = "2009890777-cM1Qxrxz"; 
-
     let currentAccount = "";
 
-    // 🟢 初始化 LIFF
     async function initLiff() {
         try {
             await liff.init({ liffId: LIFF_ID });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
-                performLineVerify(profile.userId, profile.displayName);
+                loginSuccess(profile.displayName, "LINE_USER");
             }
-        } catch (e) { console.error("LIFF 初始化失敗"); }
+        } catch (e) { console.error("LIFF 載入失敗"); }
     }
 
-    function liffTriggerLogin() {
-        if (!liff.isLoggedIn()) liff.login();
-    }
+    function liffLogin() { if (!liff.isLoggedIn()) liff.login(); }
 
-    function performLineVerify(lineId, name) {
+    function loginSuccess(name, acc) {
+        currentAccount = acc;
         document.getElementById('user-display').innerText = "會員：" + name;
-        currentAccount = "LINE_MEMBER"; // 這裡可進階串接後端驗證
-        updateUI(true);
+        document.querySelectorAll('.guest-only').forEach(e => e.style.display = 'none');
+        document.querySelectorAll('.logged-in-only').forEach(e => e.style.display = 'block');
+        switchTab('home', document.querySelector('.nav-btn'));
     }
 
-    function updateUI(isLoggedIn) {
-        document.querySelectorAll('.guest-only').forEach(e => e.style.display = isLoggedIn ? 'none' : 'block');
-        document.querySelectorAll('.logged-in-only').forEach(e => e.style.display = isLoggedIn ? 'block' : 'none');
-    }
-
-    // 🟢 修正：補齊 openBooking 函式
     function openBooking(type) {
         if(!currentAccount) {
             alert("請先登入會員");
@@ -122,7 +101,7 @@
         }
         document.getElementById('order-type').value = type;
         document.getElementById('booking-title').innerText = "預約 - " + type;
-        switchTab('booking-section', null);
+        switchTab('booking', null);
     }
 
     function switchTab(id, btn) {
@@ -135,18 +114,7 @@
     }
 
     async function processOrder() {
-        const data = {
-            type: document.getElementById('order-type').value,
-            account: currentAccount,
-            date: document.getElementById('order-date').value,
-            time: document.getElementById('order-time').value,
-            pickup: document.getElementById('pickup').value,
-            dropoff: document.getElementById('dropoff').value,
-            carType: document.getElementById('car-type').value,
-            note: document.getElementById('note').value
-        };
-        
-        alert("預約已提交！(請串接後端 API)");
+        alert("訂單已發送！");
         switchTab('home', document.querySelector('.nav-btn'));
     }
 

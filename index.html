@@ -28,7 +28,7 @@
         .section-container { display: none; width: 92%; max-width: 800px; margin: 0 auto 30px; padding: 25px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); box-sizing: border-box; }
         .active { display: block; }
 
-        /* 🔵 四個獨立價格區塊設定：從這裡調整文字與數字大小 */
+        /* 🔵 四個獨立價格區塊設定 */
         .price-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
         .price-card { background: #fff; border: 1px solid #eef2f6; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .price-card .title { font-size: 0.95rem; font-weight: bold; color: var(--dark-blue); margin-bottom: 5px; }
@@ -79,22 +79,10 @@
     </div>
     
     <div class="price-grid-4">
-        <div class="price-card">
-            <div class="title">台北松山機場</div>
-            <div class="amount">$1,000 起</div>
-        </div>
-        <div class="price-card">
-            <div class="title">桃園國際機場</div>
-            <div class="amount">$1,200 起</div>
-        </div>
-        <div class="price-card">
-            <div class="title">台中清泉崗機場</div>
-            <div class="amount">$2,500 起</div>
-        </div>
-        <div class="price-card">
-            <div class="title">高雄小港機場</div>
-            <div class="amount">$3,500 起</div>
-        </div>
+        <div class="price-card"><div class="title">台北松山機場</div><div class="amount">$1,000 起</div></div>
+        <div class="price-card"><div class="title">桃園國際機場</div><div class="amount">$1,200 起</div></div>
+        <div class="price-card"><div class="title">台中清泉崗機場</div><div class="amount">$2,500 起</div></div>
+        <div class="price-card"><div class="title">高雄小港機場</div><div class="amount">$3,500 起</div></div>
     </div>
 </div>
 
@@ -109,7 +97,7 @@
     <input type="text" id="login-name" placeholder="例如：王先生 / 李小姐 (選填)">
     
     <button class="submit-btn" id="manual-login-btn" onclick="handleManualLogin()">確認 登入 / 註冊</button>
-    <p style="font-size: 0.8rem; color: #666; text-align: center; margin-top: 15px;">*若帳號不存在，系統將自動為您完成註冊並登入。</p>
+    <p style="font-size: 0.8rem; color: #666; text-align: center; margin-top: 15px;">*首次使用請填寫手機與密碼，後續即可享有 LINE 自動登入。</p>
 </div>
 
 <div id="booking" class="section-container">
@@ -169,11 +157,12 @@
 
 <script>
     // 🔴 這裡請填入您最新的 GAS 發佈網址 與 LIFF ID
-    const API_URL = "https://script.google.com/macros/s/AKfycby8w6m5BTayw1GosD-scS8HbCTseljcCwm30AupKscazgZRlCT1GnZTkR9OSX4EOKOw/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbyyJlyShri58UTnBmzhN5qqLVjb8EnT60KCPUYRhBHoCgSYGIAuzUw9_Szbq3UoFgb2/exec"; 
     const LIFF_ID = "2009890777-cM1Qxrxz"; 
     
     let currentLoggedUser = "";
     let currentUserName = "";
+    let currentLineUserId = ""; // 🟢 儲存當前 LINE ID
 
     window.onload = function() {
         const p = document.getElementById('order-pax');
@@ -184,15 +173,32 @@
         initLiff();
     };
 
-    // 🟢 初始化 LIFF
+    // 🟢 完整的 LIFF 初始化與自動登入驗證
     async function initLiff() {
         try {
             await liff.init({ liffId: LIFF_ID });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
-                loginSuccess(profile.displayName, "LINE_" + profile.userId.substring(0,6));
+                currentLineUserId = profile.userId; // 儲存起來供綁定用
+                verifyLineAutoLogin(currentLineUserId);
             }
         } catch (e) { console.error("LIFF 初始化失敗"); }
+    }
+
+    // 🟢 向後端確認該 LINE ID 是否已存在
+    async function verifyLineAutoLogin(lineId) {
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "lineLogin", data: { lineUserId: lineId } })
+            });
+            const result = await res.json();
+            if (result.status === "Success") {
+                loginSuccess(result.user.name, result.user.account);
+            } else {
+                console.log("LINE 尚未綁定，需手動登入一次");
+            }
+        } catch (e) { console.log("LINE 自動登入驗證連線失敗"); }
     }
 
     function liffLogin() { if (!liff.isLoggedIn()) liff.login(); }
@@ -206,7 +212,6 @@
         }
     }
 
-    // 🟢 恢復舊版：動態服務欄位切換
     function adjustFieldsByService() {
         const type = document.getElementById('order-type').value;
         const note = document.getElementById('dynamic-service-note');
@@ -215,8 +220,6 @@
         
         const airportSel = `<select id="order-airport-list"><option>桃園國際機場</option><option>台北松山機場</option><option>台中清泉崗機場</option><option>高雄小港機場</option></select>`;
         const addrInp = `<input type="text" id="order-address-input" placeholder="請輸入地址">`;
-
-        // 航班必填星號顯示控制
         const flightStar = document.getElementById('flight-req-star');
 
         if (type === "機場接機") {
@@ -237,7 +240,6 @@
         }
     }
 
-    // 🟢 防呆：人數超過 4 自動跳轉 7-9人座
     function checkCarType() {
         const paxCount = parseInt(document.getElementById('order-pax').value);
         if (paxCount > 4) {
@@ -245,7 +247,7 @@
         }
     }
 
-    // 🟢 合併登入與註冊邏輯
+    // 🟢 登入/註冊：此處會一併將 currentLineUserId 送出給後端綁定
     async function handleManualLogin() {
         const ph = document.getElementById('login-phone').value.trim();
         const pwd = document.getElementById('login-pwd').value.trim();
@@ -259,13 +261,17 @@
         try {
             const res = await fetch(API_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: "loginOrRegister", data: { account: ph, password: pwd, name: name } })
+                body: JSON.stringify({ 
+                    action: "loginOrRegister", 
+                    // 送出包含 lineUserId 的資料
+                    data: { account: ph, password: pwd, name: name, lineUserId: currentLineUserId } 
+                })
             });
-            const result = await res.json(); // 讀取後端狀態
+            const result = await res.json(); 
 
             if (result.status === "Success" || result.status === "Registered") {
                 loginSuccess(result.user.name, result.user.account);
-                if(result.status === "Registered") alert("註冊成功！系統已為您自動登入。");
+                if(result.status === "Registered") alert("註冊並綁定成功！系統已為您自動登入。");
             } else if (result.status === "WrongPassword") {
                 alert("密碼錯誤，請重新確認！");
             }
@@ -276,14 +282,12 @@
         }
     }
 
-    // 🟢 登入成功 UI 處理 (動態稱謂)
     function loginSuccess(name, acc) {
         currentLoggedUser = acc;
         currentUserName = name;
         const displayName = name ? name : "尊榮會員";
         
         document.getElementById('user-display').innerText = displayName + "：" + acc;
-        // 預填會員管理表單
         document.getElementById('mem-name').value = name || "";
         
         document.querySelectorAll('.guest-only').forEach(e => e.style.display = 'none');
@@ -291,7 +295,6 @@
         switchTab('home', document.querySelector('.nav-btn'));
     }
 
-    // 🟢 打開預約畫面
     function openBooking(type) {
         if(!currentLoggedUser) {
             alert("請先完成登入或註冊！");
@@ -302,7 +305,6 @@
         switchTab('booking', null);
     }
 
-    // 🟢 處理訂單送出 (包含必填驗證防呆)
     async function handleOrder() {
         const type = document.getElementById('order-type').value;
         const flightNum = document.getElementById('order-flight').value.trim();
@@ -311,15 +313,10 @@
         const pax = parseInt(document.getElementById('order-pax').value);
         const carType = document.getElementById('order-car').value;
 
-        // 1. 基本必填防呆
         if (!date || !time) return alert("請填寫預約日期與時間！");
-        
-        // 2. 航班必填防呆
         if ((type === '機場接機' || type === '機場送機') && !flightNum) {
             return alert("預約『" + type + "』必須填寫航班編號！");
         }
-
-        // 3. 人數與車型防呆 (二次確認)
         if (pax > 4 && carType !== '豪華7~9人座車') {
             document.getElementById('order-car').value = "豪華7~9人座車";
             return alert("人數超過 4 人，已自動更換為『豪華7~9人座車』，請確認後再次點擊送出。");
@@ -356,7 +353,6 @@
         }
     }
 
-    // 🟢 會員資料更新 (僅保留稱謂與地址)
     async function updateMemberInfo() {
         const btn = document.getElementById('save-mem-btn');
         btn.disabled = true; btn.innerText = "更新中...";
@@ -371,7 +367,6 @@
                 })
             });
             alert("會員資料已成功更新。");
-            // 同步更新首頁頂部稱謂顯示
             const displayName = newName ? newName : "尊榮會員";
             document.getElementById('user-display').innerText = displayName + "：" + currentLoggedUser;
         } catch (e) {

@@ -10,7 +10,7 @@
             --primary-blue: #1E90FF; --dark-blue: #0a1930; --bg-light: #f4f7f9;
             --white: #ffffff; --success-green: #28a745; --warning-red: #d9534f;
             --note-bg: #fff4f4; --line-green: #06C755;
-            --disabled-bg: #e9ecef; /* 🟢 新增的反灰底色 */
+            --disabled-bg: #e9ecef; /* 🟢 反灰底色 */
         }
         body { background-color: var(--bg-light); margin: 0; font-family: "Microsoft JhengHei", sans-serif; }
         
@@ -30,7 +30,7 @@
         .section-container { display: none; width: 92%; max-width: 800px; margin: 0 auto 30px; padding: 25px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); box-sizing: border-box; }
         .active { display: block; }
 
-        /* 🔵 四個獨立價格區塊設定 (已依照需求移除內容，但保留CSS以免影響其他區塊) */
+        /* 🔵 四個獨立價格區塊設定 (內容已移除，保留CSS) */
         .price-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
         .price-card { background: #fff; border: 1px solid #eef2f6; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .price-card .title { font-size: 0.95rem; font-weight: bold; color: var(--dark-blue); margin-bottom: 5px; }
@@ -44,7 +44,6 @@
         .req-star { color: red; display: none; }
         
         input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        /* 🟢 新增：鎖定欄位的視覺效果 */
         input:disabled { background-color: var(--disabled-bg); cursor: not-allowed; color: #6c757d; }
         
         .submit-btn { background: var(--primary-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
@@ -128,8 +127,7 @@
         <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer; font-weight:bold; color:var(--dark-blue);" onclick="openBooking('機場送機')">🛫<br>送機</div>
         <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer; font-weight:bold; color:var(--dark-blue);" onclick="openBooking('定點接送')">📍<br>定點</div>
     </div>
-    
-    </div>
+</div>
 
 <div id="login" class="section-container">
     <h2 style="text-align:center; margin-top:0;">會員登入 / 註冊</h2>
@@ -212,7 +210,7 @@
 
 <script>
     // 🔴 這裡請填入您最新的 GAS 發佈網址 與 LIFF ID
-    const API_URL = "https://script.google.com/macros/s/AKfycby-7YrS6dPMgF8DXPccVJz-Cze5-YJbKtkD590-frIGHLSeVPNnC5EV3gArsnOB_6vc/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbxm_fqAjoIH6jtQpaPKKf7ZidyXL3j2btm03ZcQ0f3MuY984ENDMjW1zLL4vpnKmIje/exec"; 
     const LIFF_ID = "2009890777-cM1Qxrxz"; 
     
     let currentLoggedUser = "";
@@ -281,21 +279,20 @@
             pCont.innerHTML = `<label>起點 (機場)</label>` + airportSel;
             dCont.innerHTML = `<label>終點 (送達地址)</label>` + addrInp;
             flightStar.style.display = 'inline';
-            flightInput.disabled = false; // 恢復可輸入
+            flightInput.disabled = false; 
             flightInput.placeholder = "請填寫航班編號";
         } else if (type === "機場送機") {
             note.innerHTML = "<b>送機提醒：</b>使用者預定時間，但接單後服務人員將視狀況告知正確的接車時間。";
             pCont.innerHTML = `<label>起點 (接人地址)</label>` + addrInp;
             dCont.innerHTML = `<label>終點 (機場)</label>` + airportSel;
             flightStar.style.display = 'inline';
-            flightInput.disabled = false; // 恢復可輸入
+            flightInput.disabled = false; 
             flightInput.placeholder = "請填寫航班編號";
         } else {
             note.innerHTML = "<b>定點提醒：</b>若超過預定，每15分鐘加收NT$100逾時費，不足15分鐘以15分鐘計。";
             pCont.innerHTML = `<label>起點地址</label><input type="text" id="order-p-addr" placeholder="請輸入起點">`;
             dCont.innerHTML = `<label>終點地址</label><input type="text" id="order-d-addr" placeholder="請輸入終點">`;
             flightStar.style.display = 'none';
-            // 🟢 定點接送：鎖定航班輸入框
             flightInput.value = ""; 
             flightInput.disabled = true; 
             flightInput.placeholder = "此服務無需填寫航班";
@@ -404,7 +401,6 @@
                     }
                 })
             });
-            // 🟢 在這裡加入了您指定的換行與重啟提醒
             alert("訂單送出成功！已通知客服團隊。\n\n💡 小提醒：若訊息未立即更新，請嘗試滑掉重啟聊天室。");
             switchTab('home', document.querySelector('.nav-btn'));
         } catch (e) {

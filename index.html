@@ -10,6 +10,7 @@
             --primary-blue: #1E90FF; --dark-blue: #0a1930; --bg-light: #f4f7f9;
             --white: #ffffff; --success-green: #28a745; --warning-red: #d9534f;
             --note-bg: #fff4f4; --line-green: #06C755;
+            --disabled-bg: #e9ecef; /* 🟢 新增的反灰底色 */
         }
         body { background-color: var(--bg-light); margin: 0; font-family: "Microsoft JhengHei", sans-serif; }
         
@@ -29,7 +30,7 @@
         .section-container { display: none; width: 92%; max-width: 800px; margin: 0 auto 30px; padding: 25px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); box-sizing: border-box; }
         .active { display: block; }
 
-        /* 🔵 四個獨立價格區塊設定 */
+        /* 🔵 四個獨立價格區塊設定 (已依照需求移除內容，但保留CSS以免影響其他區塊) */
         .price-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
         .price-card { background: #fff; border: 1px solid #eef2f6; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .price-card .title { font-size: 0.95rem; font-weight: bold; color: var(--dark-blue); margin-bottom: 5px; }
@@ -43,6 +44,9 @@
         .req-star { color: red; display: none; }
         
         input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        /* 🟢 新增：鎖定欄位的視覺效果 */
+        input:disabled { background-color: var(--disabled-bg); cursor: not-allowed; color: #6c757d; }
+        
         .submit-btn { background: var(--primary-blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
         .logged-in-only { display: none; }
 
@@ -125,13 +129,7 @@
         <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer; font-weight:bold; color:var(--dark-blue);" onclick="openBooking('定點接送')">📍<br>定點</div>
     </div>
     
-    <div class="price-grid-4">
-        <div class="price-card"><div class="title">台北松山機場</div><div class="amount">$1,000 起</div></div>
-        <div class="price-card"><div class="title">桃園國際機場</div><div class="amount">$1,200 起</div></div>
-        <div class="price-card"><div class="title">台中清泉崗機場</div><div class="amount">$2,500 起</div></div>
-        <div class="price-card"><div class="title">高雄小港機場</div><div class="amount">$3,500 起</div></div>
     </div>
-</div>
 
 <div id="login" class="section-container">
     <h2 style="text-align:center; margin-top:0;">會員登入 / 註冊</h2>
@@ -182,9 +180,9 @@
 
     <label>車型需求</label>
     <select id="order-car">
-        <option value="豪華轎車 (4人座)">豪華轎車 (4人座)</option>
-        <option value="豪華休旅車 (4人座)">豪華休旅車 (4人座)</option>
-        <option value="豪華7~9人座車">豪華7~9人座車</option>
+        <option value="豪華轎車 (5人座)">豪華轎車 (5人座)</option>
+        <option value="豪華休旅車 (5人座)">豪華休旅車 (5人座)</option>
+        <option value="商務7~9人座車">商務7~9人座車</option>
     </select>
 
     <div class="notice-box">
@@ -214,7 +212,7 @@
 
 <script>
     // 🔴 這裡請填入您最新的 GAS 發佈網址 與 LIFF ID
-    const API_URL = "https://script.google.com/macros/s/AKfycbwH2WkRZGMN3RUVLIjuG2LDHi-DF3-bVpZcg_3KxiIBZp349Zg75hjynmrtsw_BxoXU/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycby-7YrS6dPMgF8DXPccVJz-Cze5-YJbKtkD590-frIGHLSeVPNnC5EV3gArsnOB_6vc/exec"; 
     const LIFF_ID = "2009890777-cM1Qxrxz"; 
     
     let currentLoggedUser = "";
@@ -272,33 +270,42 @@
         const note = document.getElementById('dynamic-service-note');
         const pCont = document.getElementById('pickup-container');
         const dCont = document.getElementById('dropoff-container');
+        const flightInput = document.getElementById('order-flight'); // 🟢 取得航班輸入框元素
         
         const airportSel = `<select id="order-airport-list"><option>桃園國際機場</option><option>台北松山機場</option><option>台中清泉崗機場</option><option>高雄小港機場</option></select>`;
         const addrInp = `<input type="text" id="order-address-input" placeholder="請輸入地址">`;
         const flightStar = document.getElementById('flight-req-star');
 
         if (type === "機場接機") {
-            note.innerHTML = "<b>接機提醒：</b>落地過90分鐘未上車，將產生逾時費。";
+            note.innerHTML = "<b>接機提醒：</b>若超過落地時間90分鐘、，仍未上車，每15分鐘加收NT$100逾時費，不足15分鐘以15分鐘計。";
             pCont.innerHTML = `<label>起點 (機場)</label>` + airportSel;
             dCont.innerHTML = `<label>終點 (送達地址)</label>` + addrInp;
             flightStar.style.display = 'inline';
+            flightInput.disabled = false; // 恢復可輸入
+            flightInput.placeholder = "請填寫航班編號";
         } else if (type === "機場送機") {
-            note.innerHTML = "<b>送機提醒：</b>請提早於起飛前3小時出發。";
+            note.innerHTML = "<b>送機提醒：</b>使用者預定時間，但接單後服務人員將視狀況告知正確的接車時間。";
             pCont.innerHTML = `<label>起點 (接人地址)</label>` + addrInp;
             dCont.innerHTML = `<label>終點 (機場)</label>` + airportSel;
             flightStar.style.display = 'inline';
+            flightInput.disabled = false; // 恢復可輸入
+            flightInput.placeholder = "請填寫航班編號";
         } else {
-            note.innerHTML = "<b>定點提醒：</b>市區預約接送。";
+            note.innerHTML = "<b>定點提醒：</b>若超過預定，每15分鐘加收NT$100逾時費，不足15分鐘以15分鐘計。";
             pCont.innerHTML = `<label>起點地址</label><input type="text" id="order-p-addr" placeholder="請輸入起點">`;
             dCont.innerHTML = `<label>終點地址</label><input type="text" id="order-d-addr" placeholder="請輸入終點">`;
             flightStar.style.display = 'none';
+            // 🟢 定點接送：鎖定航班輸入框
+            flightInput.value = ""; 
+            flightInput.disabled = true; 
+            flightInput.placeholder = "此服務無需填寫航班";
         }
     }
 
     function checkCarType() {
         const paxCount = parseInt(document.getElementById('order-pax').value);
         if (paxCount > 4) {
-            document.getElementById('order-car').value = "豪華7~9人座車";
+            document.getElementById('order-car').value = "商務7~9人座車";
         }
     }
 
@@ -370,9 +377,9 @@
         if ((type === '機場接機' || type === '機場送機') && !flightNum) {
             return alert("預約『" + type + "』必須填寫航班編號！");
         }
-        if (pax > 4 && carType !== '豪華7~9人座車') {
-            document.getElementById('order-car').value = "豪華7~9人座車";
-            return alert("人數超過 4 人，已自動更換為『豪華7~9人座車』，請確認後再次點擊送出。");
+        if (pax > 4 && carType !== '商務7~9人座車') {
+            document.getElementById('order-car').value = "商務7~9人座車";
+            return alert("人數超過 4 人，已自動更換為『商務7~9人座車』，請確認後再次點擊送出。");
         }
 
         let pV, dV;
@@ -397,7 +404,8 @@
                     }
                 })
             });
-            alert("訂單送出成功！已通知客服團隊。");
+            // 🟢 在這裡加入了您指定的換行與重啟提醒
+            alert("訂單送出成功！已通知客服團隊。\n\n💡 小提醒：若訊息未立即更新，請嘗試滑掉重啟聊天室。");
             switchTab('home', document.querySelector('.nav-btn'));
         } catch (e) {
             alert("傳送失敗，請檢查網路連線。");

@@ -20,7 +20,9 @@
         
         header { background-color: var(--primary-blue); color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .banner-container { width: 92%; max-width: 1000px; margin: 15px auto; }
-        .img-grid-2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; }
+        
+        /* 🟢 修正：將 1.5fr 1fr 改為 1fr 1fr，讓兩張圖片完全等寬，手機版更美觀 */
+        .img-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .img-grid-2 img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; }
 
         .nav-menu { display: flex; justify-content: center; gap: 8px; margin: 15px 0; padding: 0 10px; }
@@ -125,7 +127,7 @@
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
         <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer; font-weight:bold; color:var(--dark-blue);" onclick="openBooking('機場接機')">✈️<br>接機</div>
         <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer; font-weight:bold; color:var(--dark-blue);" onclick="openBooking('機場送機')">🛫<br>送機</div>
-        <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer; font-weight:bold; color:var(--dark-blue);" onclick="openBooking('定點接送')">📍<br>定點</div>
+        <div style="background:#eef7ff; padding:15px; border-radius:12px; text-align:center; cursor:pointer; font-weight:bold; color:var(--dark-blue);" onclick="openBooking('定點接送')">📍<br>定點接送</div>
     </div>
 </div>
 
